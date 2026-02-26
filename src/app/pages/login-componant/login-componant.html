@@ -1,0 +1,104 @@
+<main class="flex items-center justify-center  px-4  bg-gray-50">
+    <form #loginForm="ngForm" class="w-full max-w-md space-y-8">
+        <!-- Header Section -->
+        <div class="text-center">
+            <a href="https://prebuiltui.com" class="inline-block" title="Go to PrebuiltUI">
+                <img src="Deep-Lines-Logo.png" alt="Deep Lines Logo" class="size-28">
+            </a>
+
+            <h2 class="mt-6 text-3xl font-bold text-gray-900">Welcome back</h2>
+            <p class="mt-2 text-sm text-gray-600">
+                Please enter your credentials to access your account
+            </p>
+        </div>
+
+        <!-- Form Fields -->
+        <div class="space-y-6">
+            <!-- Email Field -->
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700">
+                    Email address
+                </label>
+                <div class="mt-1">
+                    <input
+                        id="email"
+                        name="email"
+                        type="email"
+                        #email="ngModel"
+                        [(ngModel)]="model.Email"
+                        required
+                        placeholder="you@example.com"
+                        class="block w-full px-4 py-3 text-gray-900 placeholder-gray-400 transition duration-150 ease-in-out border rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-offset-2"
+                        [class.border-gray-300]="!email.touched || email.valid"
+                        [class.border-red-300]="email.invalid && email.touched"
+                        [class.ring-red-500]="email.invalid && email.touched"
+                        [class.ring-2]="email.invalid && email.touched"
+                        [class.border-indigo-300]="email.valid && email.touched"
+                        [class.ring-indigo-500]="email.valid && email.touched"
+                        [class.ring-2]="email.valid && email.touched"
+                    />
+                </div>
+                <!-- Error Message -->
+                <div *ngIf="email.invalid && email.touched" class="mt-2 text-sm text-red-600">
+                    <span *ngIf="email.errors?.['required']">Email is required</span>
+                    <span *ngIf="email.errors?.['pattern']">Please enter a valid email address</span>
+                </div>
+            </div>
+
+            <!-- Password Field -->
+            <div>
+                <div class="flex items-center justify-between">
+                    <label for="password" class="block text-sm font-medium text-gray-700">
+                        Password
+                    </label>
+                    <span href="" (click)="forgetPassword()"  class="text-sm font-medium text-[#F6302B] hover:text-[#ff0400] cursor-help">
+                        Forgot password?
+                    </span>
+                </div>
+                <div class="mt-1">
+                    <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        #password="ngModel"
+                        [(ngModel)]="model.Password"
+                        required
+                        placeholder="••••••••"
+                        class="block w-full px-4 py-3 text-gray-900 placeholder-gray-400 transition duration-150 ease-in-out border rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-offset-2"
+                        [class.border-gray-300]="!password.touched || password.valid"
+                        [class.border-red-300]="password.invalid && password.touched"
+                        [class.ring-red-500]="password.invalid && password.touched"
+                        [class.ring-2]="password.invalid && password.touched"
+                        [class.border-indigo-300]="password.valid && password.touched"
+                        [class.ring-indigo-500]="password.valid && password.touched"
+                        [class.ring-2]="password.valid && password.touched"
+                    />
+                </div>
+                <!-- Error Message -->
+                <div *ngIf="password.invalid && password.touched" class="mt-2 text-sm text-red-600">
+                    <span *ngIf="password.errors?.['required']">Password is required</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div>
+            <button
+                type="submit"
+                (click)="onSubmit(loginForm)"
+                [disabled]="loginForm.invalid"
+                class="relative flex justify-center w-full px-4 py-3 text-sm font-medium text-white transition duration-150 ease-in-out bg-[#F6302B] border border-transparent rounded-lg group hover:bg-[#ff0400] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                    <svg class="w-5 h-5 text-[#f6b6b5]"
+                         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                              d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                              clip-rule="evenodd" />
+                    </svg>
+                </span>
+                Sign in
+            </button>
+        </div>
+    </form>
+</main>
