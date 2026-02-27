@@ -28,7 +28,7 @@
                         [(ngModel)]="model.Email"
                         required
                         placeholder="you@example.com"
-                        class="block w-full px-4 py-3 text-gray-900 placeholder-gray-400 transition duration-150 ease-in-out border rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-offset-2"
+                        class="block w-full px-4 py-3 text-gray-900 placeholder-gray-400 transition duration-150 ease-in-out border rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                         [class.border-gray-300]="!email.touched || email.valid"
                         [class.border-red-300]="email.invalid && email.touched"
                         [class.ring-red-500]="email.invalid && email.touched"
@@ -64,7 +64,7 @@
                         [(ngModel)]="model.Password"
                         required
                         placeholder="••••••••"
-                        class="block w-full px-4 py-3 text-gray-900 placeholder-gray-400 transition duration-150 ease-in-out border rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-offset-2"
+                        class="block w-full  px-4 py-3 text-gray-900 placeholder-gray-400 transition duration-150 ease-in-out border rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                         [class.border-gray-300]="!password.touched || password.valid"
                         [class.border-red-300]="password.invalid && password.touched"
                         [class.ring-red-500]="password.invalid && password.touched"
