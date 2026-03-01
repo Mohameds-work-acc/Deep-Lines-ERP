@@ -32,6 +32,7 @@ export class LoginComponant {
           next: (res) => {
             this.loading = false;
             this.sharedService.showToast(res.message, 'success');
+            this.router.navigate(['/dashboard']);
           }
           ,
           error: (err) => {

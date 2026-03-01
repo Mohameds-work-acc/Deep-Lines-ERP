@@ -5,18 +5,21 @@ import { tap, catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { LoginResponse } from '../models/Response/AuthDTOs/login-response.dto';
 
+import { JwtHelperService } from '@auth0/angular-jwt';
+
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   private apiUrl = environment.baseUrl;
 
+  private jwtHelper = new JwtHelperService();
+
   private readonly ACCESS_TOKEN_KEY = 'DeepLines_accessToken';
   private readonly REFRESH_TOKEN_KEY = 'DeepLines_refreshToken';
   private readonly ACCESS_EXPIRES_KEY = 'DeepLines_accessTokenExpire';
   private readonly REFRESH_EXPIRES_KEY = 'DeepLines_refreshTokenExpire';
-  private readonly USER_ID = 'DeepLines_userId';
-  private readonly USER_ROLE = 'DeepLines_userRole';
+
   constructor(private http: HttpClient) {}
 
   Login(loginDTO: any): Observable<LoginResponse> {
@@ -51,20 +54,48 @@ export class AuthService {
     if (!res) {
       return;
     }
+
+    const decodedToken = this.jwtHelper.decodeToken(res.token);
+    const expiresIn = decodedToken.exp * 1000 - Date.now();
+
+
+
     localStorage.setItem(this.ACCESS_TOKEN_KEY, res.token);
     localStorage.setItem(this.REFRESH_TOKEN_KEY, res.refreshToken.token);
-    localStorage.setItem(this.ACCESS_EXPIRES_KEY,  new Date(Date.now() + 60 * 60 * 1000).toISOString());
+    localStorage.setItem(this.ACCESS_EXPIRES_KEY,  new Date(Date.now() + expiresIn).toISOString());
     localStorage.setItem(this.REFRESH_EXPIRES_KEY, res.refreshToken.expiryDate);
-    localStorage.setItem(this.USER_ID, res.user.id.toString());
-    localStorage.setItem(this.USER_ROLE, res.user.role);
+
+
   }
 
   getUserId(): string | null {
-    return localStorage.getItem(this.USER_ID);
+
+    const decodedToken = this.getDecodedToken();
+    return decodedToken ? decodedToken.sub : null;
+
   }
 
   getUserRole(): string | null {
-    return localStorage.getItem(this.USER_ROLE);
+    const decodedToken = this.getDecodedToken();
+    // The full claim URI for role
+    return decodedToken ? decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] : null;
+  }
+  getUserEmail(): string | null {
+
+    const decodedToken = this.getDecodedToken();
+    return decodedToken ? decodedToken.email : null;
+
+  }
+  getUserFullName(): string | null {
+
+    const decodedToken = this.getDecodedToken();
+    return decodedToken ? decodedToken.name : null;
+  }
+
+  getUserJobTitle(): string | null {
+
+    const decodedToken = this.getDecodedToken();
+    return decodedToken ? decodedToken['jopTitle'] : null;
   }
 
   clearTokens(): void {
@@ -72,8 +103,6 @@ export class AuthService {
     localStorage.removeItem(this.REFRESH_TOKEN_KEY);
     localStorage.removeItem(this.ACCESS_EXPIRES_KEY);
     localStorage.removeItem(this.REFRESH_EXPIRES_KEY);
-    localStorage.removeItem(this.USER_ID);
-    localStorage.removeItem(this.USER_ROLE);
   }
 
   getAccessToken(): string | null {
@@ -82,6 +111,11 @@ export class AuthService {
 
   getRefreshToken(): string | null {
     return localStorage.getItem(this.REFRESH_TOKEN_KEY);
+  }
+
+  private getDecodedToken() {
+    const token = localStorage.getItem(this.ACCESS_TOKEN_KEY);
+    return token ? this.jwtHelper.decodeToken(token) : null;
   }
 
   isAuthenticated(): boolean {

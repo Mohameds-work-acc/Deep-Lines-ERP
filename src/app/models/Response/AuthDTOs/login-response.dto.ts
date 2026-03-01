@@ -6,10 +6,5 @@ export interface LoginResponse {
     token: string;
     expiryDate: string;
   };
-  user : {
-    id: number;
-    email: string;
-    role : string;
-  };
   message: string;
 }

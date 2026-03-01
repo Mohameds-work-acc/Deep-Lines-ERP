@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap');
+        * { font-family: 'Inter', system-ui, sans-serif; }
+        .brand-soft-gradient {
+            background: linear-gradient(145deg, #1e2b3a, #253544);
+        }
+        /* smooth width transition for main sidebar */
+        .sidebar-transition {
+            transition: width 0.25s ease-in-out, padding 0.2s ease;
+        }
+        /* smooth height transition for sector sub-menus */
+        .submenu-collapsible {
+            overflow: hidden;
+            transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            max-height: 0;
+        }
+        .submenu-collapsible.open {
+            max-height: 200px;
+        }
+        /* chevron rotation */
+        .rotate-chevron {
+            transition: transform 0.2s;
+        }
+        .rotate-chevron.open {
+            transform: rotate(90deg);
+        }
+        /* active link style (will be applied via js) */
+        .nav-active {
+            background-color: rgba(255, 255, 255, 0.9) !important;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.9);
+            box-shadow: 0 4px 10px rgba(79, 114, 202, 0.15);
+            color: #1e3a8a !important;
+            font-weight: 600;
+        }
+        .nav-active i {
+            color: #4f46e5 !important;
+        }
+        /* submenu items active style */
+        .sub-active {
+            background-color: rgba(255, 255, 255, 0.7);
+            color: #1e3a8a;
+            font-weight: 500;
+        }
+        .sub-link.nav-active {
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #1e3a8a;
+            font-weight: 600;
+            border-left: 3px solid #4f46e5;
+            border-radius: 0 12px 12px 0;
+        }

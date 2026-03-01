@@ -1,390 +1,130 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ERP sidebar · active link + smooth toggles</title>
-    <!-- Tailwind + Font Awesome -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap');
-        * { font-family: 'Inter', system-ui, sans-serif; }
-        .brand-soft-gradient {
-            background: linear-gradient(145deg, #1e2b3a, #253544);
-        }
-        /* smooth width transition for main sidebar */
-        .sidebar-transition {
-            transition: width 0.25s ease-in-out, padding 0.2s ease;
-        }
-        /* smooth height transition for sector sub-menus */
-        .submenu-collapsible {
-            overflow: hidden;
-            transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            max-height: 0;
-        }
-        .submenu-collapsible.open {
-            max-height: 200px;
-        }
-        /* chevron rotation */
-        .rotate-chevron {
-            transition: transform 0.2s;
-        }
-        .rotate-chevron.open {
-            transform: rotate(90deg);
-        }
-        /* active link style (will be applied via js) */
-        .nav-active {
-            background-color: rgba(255, 255, 255, 0.9) !important;
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(255,255,255,0.9);
-            box-shadow: 0 4px 10px rgba(79, 114, 202, 0.15);
-            color: #1e3a8a !important;
-            font-weight: 600;
-        }
-        .nav-active i {
-            color: #4f46e5 !important;
-        }
-        /* submenu items active style */
-        .sub-active {
-            background-color: rgba(255, 255, 255, 0.7);
-            color: #1e3a8a;
-            font-weight: 500;
-        }
-    </style>
-</head>
-<body class="min-h-screen bg-[#edf2f9] flex items-start justify-start p-6">
-
-    <!--
-        SIDEBAR with ACTIVE LINK FOCUS
-        - click any link (main or sub) highlights it, removes highlight from others
-        - sectors (HR, Finance) toggles submenus, also participate in active state
-    -->
-    <aside id="sidebar" class="
-        sidebar-transition
-        w-[280px]
-        bg-white/60
-        backdrop-blur-xl
-        backdrop-saturate-150
-        rounded-[36px]
-        border border-white/50
-        shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)]
-        p-6
-        flex
-        flex-col
-        gap-4
-        relative
-        overflow-visible
-    ">
-        <!-- main toggle button -->
-        <button id="toggleBtn" class="
-            absolute -right-3 top-10
-            w-8 h-8
-            bg-white/80 backdrop-blur-sm
-            rounded-full
-            border border-white/70
-            shadow-md
-            flex items-center justify-center
-            text-indigo-700
-            hover:scale-105 transition
-            z-30
-            cursor-pointer
-        ">
-            <i id="toggleIcon" class="fas fa-chevron-left text-sm"></i>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<aside
+        [ngClass]="{'w-[88px] p-4': collapsed, 'w-[280px] p-6': !collapsed}"
+        class="h-full sidebar-transition bg-white/60 backdrop-blur-xl backdrop-saturate-150 rounded-[36px] border border-white/50 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] flex flex-col gap-4 relative overflow-visible flex-shrink-0"
+      >
+        <!-- toggle button -->
+        <button
+          (click)="toggleSidebar()"
+          class="absolute -right-3 top-10 w-8 h-8 bg-white/80 backdrop-blur-sm rounded-full border border-white/70 shadow-md flex items-center justify-center text-indigo-700 hover:scale-105 transition z-30 cursor-pointer"
+        >
+          <i [ngClass]="collapsed ? 'fa-chevron-right' : 'fa-chevron-left'" class="fas text-sm"></i>
         </button>
 
-        <!-- ===== HEADER ===== -->
+        <!-- HEADER -->
         <div class="flex items-center gap-3 px-1">
-            <div class="
-                w-10 h-10
-                brand-soft-gradient
-                rounded-[18px]
-                flex items-center justify-center
-                text-white text-xl
-                shadow-lg shadow-gray-400/20
-                flex-shrink-0
-            ">
-                <i class="fas fa-cube"></i>
-            </div>
-            <div id="headerText" class="flex items-baseline transition-all duration-200">
-                <span class="font-bold text-xl tracking-tight bg-gradient-to-br from-[#1f2a3f] to-[#2c3b50] bg-clip-text text-transparent whitespace-nowrap">
-                    erp<span class="text-[#2c3b50]">nexus</span>
-                </span>
-                <span class="ml-2 text-[10px] font-semibold bg-indigo-100/80 text-indigo-800 px-2 py-0.5 rounded-full border border-white/50 backdrop-blur-sm whitespace-nowrap">
-                    v2.0
-                </span>
-            </div>
+          <img src="Deep-Lines-Logo.png" alt="Logo" class="size-16 rounded-lg">
+          <div *ngIf="!collapsed" class="flex items-baseline transition-all duration-200">
+            <span class="font-bold text-xl tracking-tight bg-gradient-to-br from-[#1f2a3f] to-[#2c3b50] bg-clip-text text-transparent whitespace-nowrap">
+              ERP<span class="text-[#2c3b50]">deeplines</span>
+            </span>
+          </div>
         </div>
 
-        <!-- ===== PRIMARY NAV ===== -->
-        <nav class="flex flex-col gap-2 mt-1" id="primaryNav">
+        <!-- SEARCH -->
+        <div *ngIf="!collapsed" class="flex items-center gap-3 bg-white/70 rounded-3xl py-2.5 px-4 border border-white/90 shadow-sm backdrop-blur-sm group focus-within:ring-2 ring-indigo-200/70 transition-all duration-200">
+          <i class="fas fa-search text-sm text-[#5b6f88] group-focus-within:text-indigo-600"></i>
+          <input type="text" placeholder="Search modules..." class="w-full bg-transparent outline-none text-sm text-[#1f2a3f] placeholder-[#8a9bb5] font-medium">
+        </div>
 
-            <!-- DASHBOARD -->
-            <a href="#" class="nav-link flex items-center gap-4 px-4 py-3 rounded-2xl text-[#1f2a3f] font-medium transition-all duration-200 hover:bg-white/70 hover:shadow-sm active:scale-[0.98] group" data-nav-id="dashboard">
-                <span class="w-5 text-[#4b6589] group-hover:text-indigo-700 transition flex-shrink-0"><i class="fas fa-chart-pie"></i></span>
-                <span class="nav-text text-sm whitespace-nowrap">Dashboard</span>
-                <span class="nav-badge ml-auto bg-indigo-100 text-indigo-800 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-white/60 whitespace-nowrap">live</span>
-            </a>
+        <!-- PRIMARY NAV -->
+        <nav class="flex flex-col gap-2 mt-1">
+          <!-- Dashboard -->
+          <a
+            href="#"
+            (click)="setActiveLink('dashboard')"
+            [ngClass]="{'nav-active': activeLink === 'dashboard'}"
+            class="nav-link flex items-center gap-4 px-4 py-3 rounded-2xl text-[#1f2a3f] font-medium transition-all duration-200 hover:bg-white/70 hover:shadow-sm active:scale-[0.98] group"
+          >
+            <span class="w-5 text-[#4b6589] group-hover:text-indigo-700 transition flex-shrink-0"><i class="fas fa-chart-pie"></i></span>
+            <span *ngIf="!collapsed" class="nav-text text-sm whitespace-nowrap">Dashboard</span>
+            <span *ngIf="!collapsed" class="nav-badge ml-auto bg-indigo-100 text-indigo-800 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-white/60 whitespace-nowrap">live</span>
+          </a>
 
-            <!-- INVENTORY -->
-            <a href="#" class="nav-link flex items-center gap-4 px-4 py-3 rounded-2xl text-[#1f2a3f] font-medium hover:bg-white/70 hover:shadow-sm group" data-nav-id="inventory">
-                <span class="w-5 text-[#4b6589] group-hover:text-indigo-700 flex-shrink-0"><i class="fas fa-boxes"></i></span>
-                <span class="nav-text text-sm whitespace-nowrap">Inventory</span>
-                <span class="nav-badge ml-auto text-[10px] bg-indigo-200/70 text-indigo-800 px-2 py-0.5 rounded-full whitespace-nowrap">9+</span>
-            </a>
-
-            <!-- PROCUREMENT -->
-            <a href="#" class="nav-link flex items-center gap-4 px-4 py-3 rounded-2xl text-[#1f2a3f] font-medium hover:bg-white/70 hover:shadow-sm group" data-nav-id="procurement">
-                <span class="w-5 text-[#4b6589] group-hover:text-indigo-700 flex-shrink-0"><i class="fas fa-truck"></i></span>
-                <span class="nav-text text-sm whitespace-nowrap">Procurement</span>
-            </a>
-
-            <!-- FINANCE SECTOR (toggle + sublinks) -->
-            <div class="sector-group">
-                <div class="sector-toggle flex items-center gap-4 px-4 py-3 rounded-2xl text-[#1f2a3f] font-medium cursor-pointer hover:bg-white/70 transition-all duration-200 group" data-target="finance-sub">
-                    <span class="w-5 text-[#4b6589] group-hover:text-indigo-700 flex-shrink-0"><i class="fas fa-coins"></i></span>
-                    <span class="nav-text text-sm whitespace-nowrap">Finance</span>
-                    <i class="sector-chevron fas fa-chevron-right text-xs ml-auto text-[#6a7f9b] rotate-chevron transition-transform"></i>
-                </div>
-                <div id="finance-sub" class="submenu-collapsible pl-12 pr-2 flex flex-col gap-1 mt-1">
-                    <a href="#" class="sub-link block py-2 text-sm text-[#3e5470] hover:text-indigo-700 transition rounded-xl px-3 hover:bg-white/60 whitespace-nowrap" data-nav-id="finance-invoices">— Invoices</a>
-                    <a href="#" class="sub-link block py-2 text-sm text-[#3e5470] hover:text-indigo-700 transition rounded-xl px-3 hover:bg-white/60 whitespace-nowrap" data-nav-id="finance-payments">— Payments</a>
-                    <a href="#" class="sub-link block py-2 text-sm text-[#3e5470] hover:text-indigo-700 transition rounded-xl px-3 hover:bg-white/60 whitespace-nowrap" data-nav-id="finance-reports">— Reports</a>
-                </div>
+          <!-- FINANCE SECTOR -->
+          <div class="sector-group">
+            <div
+              (click)="toggleSector('finance')"
+              class="sector-toggle flex items-center gap-4 px-4 py-3 rounded-2xl text-[#1f2a3f] font-medium cursor-pointer hover:bg-white/70 transition-all duration-200 group"
+            >
+              <span class="w-5 text-[#4b6589] group-hover:text-indigo-700 flex-shrink-0"><i class="fa-solid fa-coins"></i></span>
+              <span *ngIf="!collapsed" class="nav-text text-sm whitespace-nowrap">Finance</span>
+              <i *ngIf="!collapsed" class="sector-chevron fas fa-chevron-right text-xs ml-auto text-[#6a7f9b]" [ngClass]="{'open': openSectors.finance}"></i>
             </div>
-
-            <!-- HR SECTOR (toggle + sublinks) -->
-            <div class="sector-group">
-                <div class="sector-toggle flex items-center gap-4 px-4 py-3 rounded-2xl text-[#1f2a3f] font-medium cursor-pointer hover:bg-white/70 transition-all duration-200 group" data-target="hr-sub">
-                    <span class="w-5 text-[#4b6589] group-hover:text-indigo-700 flex-shrink-0"><i class="fas fa-users"></i></span>
-                    <span class="nav-text text-sm whitespace-nowrap">Human resources</span>
-                    <span class="nav-badge ml-auto text-[10px] bg-amber-100/80 text-amber-800 px-2 py-0.5 rounded-full border border-white/50 whitespace-nowrap">2</span>
-                    <i class="sector-chevron fas fa-chevron-right text-xs ml-1 text-[#6a7f9b] rotate-chevron transition-transform"></i>
-                </div>
-                <div id="hr-sub" class="submenu-collapsible pl-12 pr-2 flex flex-col gap-1 mt-1">
-                    <a href="#" class="sub-link block py-2 text-sm text-[#3e5470] hover:text-indigo-700 transition rounded-xl px-3 hover:bg-white/60 whitespace-nowrap" data-nav-id="hr-employees">— Employees</a>
-                    <a href="#" class="sub-link block py-2 text-sm text-[#3e5470] hover:text-indigo-700 transition rounded-xl px-3 hover:bg-white/60 whitespace-nowrap" data-nav-id="hr-payroll">— Payroll</a>
-                    <a href="#" class="sub-link block py-2 text-sm text-[#3e5470] hover:text-indigo-700 transition rounded-xl px-3 hover:bg-white/60 whitespace-nowrap" data-nav-id="hr-recruitment">— Recruitment</a>
-                    <a href="#" class="sub-link block py-2 text-sm text-[#3e5470] hover:text-indigo-700 transition rounded-xl px-3 hover:bg-white/60 whitespace-nowrap" data-nav-id="hr-timeoff">— Time off</a>
-                </div>
+            <div *ngIf="!collapsed" class="submenu-collapsible pl-12 pr-2 flex flex-col gap-1 mt-1" [ngClass]="{'open': openSectors.finance}">
+              <a
+                (click)="setActiveLink('finance-invoices')"
+                [ngClass]="{'nav-active': activeLink === 'finance-invoices'}"
+                class="sub-link block py-2 text-sm text-[#3e5470] hover:text-indigo-700 transition rounded-xl px-3 hover:bg-white/60 whitespace-nowrap"
+              >— Invoices</a>
+              <a
+                (click)="setActiveLink('finance-payments')"
+                [ngClass]="{'nav-active': activeLink === 'finance-payments'}"
+                class="sub-link block py-2 text-sm text-[#3e5470] hover:text-indigo-700 transition rounded-xl px-3 hover:bg-white/60 whitespace-nowrap"
+              >— Payments</a>
+              <a
+                (click)="setActiveLink('finance-reports')"
+                [ngClass]="{'nav-active': activeLink === 'finance-reports'}"
+                class="sub-link block py-2 text-sm text-[#3e5470] hover:text-indigo-700 transition rounded-xl px-3 hover:bg-white/60 whitespace-nowrap"
+              >— Reports</a>
             </div>
+          </div>
 
-            <!-- ANALYTICS -->
-            <a href="#" class="nav-link flex items-center gap-4 px-4 py-3 rounded-2xl text-[#1f2a3f] font-medium hover:bg-white/70 hover:shadow-sm group" data-nav-id="analytics">
-                <span class="w-5 text-[#4b6589] group-hover:text-indigo-700 flex-shrink-0"><i class="fas fa-chart-line"></i></span>
-                <span class="nav-text text-sm whitespace-nowrap">Analytics</span>
-            </a>
+          <!-- HR SECTOR -->
+          <div class="sector-group">
+            <div
+              (click)="toggleSector('hr')"
+              class="sector-toggle flex items-center gap-4 px-4 py-3 rounded-2xl text-[#1f2a3f] font-medium cursor-pointer hover:bg-white/70 transition-all duration-200 group"
+            >
+              <span class="w-5 text-[#4b6589] group-hover:text-indigo-700 flex-shrink-0"><i class="fas fa-users"></i></span>
+              <span *ngIf="!collapsed" class="nav-text text-sm whitespace-nowrap">Human resources</span>
+              <span *ngIf="!collapsed" class="nav-badge ml-auto text-[10px] bg-amber-100/80 text-amber-800 px-2 py-0.5 rounded-full border border-white/50 whitespace-nowrap">2</span>
+              <i *ngIf="!collapsed" class="sector-chevron fas fa-chevron-right text-xs ml-1 text-[#6a7f9b]" [ngClass]="{'open': openSectors.hr}"></i>
+            </div>
+            <div *ngIf="!collapsed" class="submenu-collapsible pl-12 pr-2 flex flex-col gap-1 mt-1" [ngClass]="{'open': openSectors.hr}">
+              <a
+                routerLink="employees"
+                [ngClass]="{'nav-active': activeLink === 'employees'}"
+                class="sub-link block py-2 text-sm text-[#3e5470] hover:text-indigo-700 transition rounded-xl px-3 hover:bg-white/60 whitespace-nowrap"
+              >— Employees</a>
+              <a
+                (click)="setActiveLink('hr-payroll')"
+                [ngClass]="{'nav-active': activeLink === 'hr-payroll'}"
+                class="sub-link block py-2 text-sm text-[#3e5470] hover:text-indigo-700 transition rounded-xl px-3 hover:bg-white/60 whitespace-nowrap"
+              >— Payroll</a>
+              <a
+                (click)="setActiveLink('hr-recruitment')"
+                [ngClass]="{'nav-active': activeLink === 'hr-recruitment'}"
+                class="sub-link block py-2 text-sm text-[#3e5470] hover:text-indigo-700 transition rounded-xl px-3 hover:bg-white/60 whitespace-nowrap"
+              >— Recruitment</a>
+              <a
+                (click)="setActiveLink('hr-timeoff')"
+                [ngClass]="{'nav-active': activeLink === 'hr-timeoff'}"
+                class="sub-link block py-2 text-sm text-[#3e5470] hover:text-indigo-700 transition rounded-xl px-3 hover:bg-white/60 whitespace-nowrap"
+              >— Time off</a>
+            </div>
+          </div>
         </nav>
 
-        <!-- ===== DIVIDER ===== -->
-        <div id="divider" class="border-t border-white/40 my-1"></div>
+        <!-- DIVIDER -->
+        <div *ngIf="!collapsed" class="border-t border-white/40 my-1"></div>
 
-        <!-- ===== SECONDARY / UTILITY ===== -->
+        <!-- SECONDARY NAV -->
         <div class="flex flex-col gap-2">
-            <a href="#" class="nav-link flex items-center gap-4 px-4 py-2.5 rounded-2xl text-sm text-[#2d4055] font-medium hover:bg-white/60 transition group" data-nav-id="settings">
-                <span class="w-5 text-[#5f7a9a] group-hover:text-indigo-600 flex-shrink-0"><i class="fas fa-cog"></i></span>
-                <span class="nav-text whitespace-nowrap">System settings</span>
-            </a>
-            <a href="#" class="nav-link flex items-center gap-4 px-4 py-2.5 rounded-2xl text-sm text-[#2d4055] font-medium hover:bg-white/60 transition group" data-nav-id="compliance">
-                <span class="w-5 text-[#5f7a9a] group-hover:text-indigo-600 flex-shrink-0"><i class="fas fa-shield-alt"></i></span>
-                <span class="nav-text whitespace-nowrap">Compliance</span>
-                <span class="nav-badge ml-auto text-[10px] bg-emerald-100/70 text-emerald-800 px-2 py-0.5 rounded-full border border-white/50 whitespace-nowrap">GDPR</span>
-            </a>
         </div>
 
-        <!-- ===== BOTTOM CARD / USER ===== -->
+        <!-- USER CARD -->
         <div class="mt-auto pt-3 flex flex-col gap-4">
-            <div id="userCard" class="
-                flex items-center gap-3
-                bg-white/70 backdrop-blur-sm
-                rounded-2xl
-                p-2
-                border border-white/80
-                shadow-sm
-                hover:bg-white/80 transition
-                cursor-pointer
-            ">
-                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-300 text-white flex items-center justify-center shadow-md flex-shrink-0">
-                    <span class="text-sm font-bold">JD</span>
-                </div>
-                <div id="userInfo" class="flex-1 transition-all duration-200">
-                    <div class="text-sm font-semibold text-[#1f2a3f] whitespace-nowrap">Jessie Du</div>
-                    <div class="text-[10px] text-[#5c6f88] flex items-center gap-1 whitespace-nowrap">
-                        <i class="fas fa-circle text-[8px] text-emerald-500"></i> Finance admin
-                    </div>
-                </div>
-                <i class="fas fa-chevron-right text-xs text-[#7c8ba5] flex-shrink-0"></i>
+          <div class="flex items-center gap-3 bg-white/70 backdrop-blur-sm rounded-2xl p-2 border border-white/80 shadow-sm hover:bg-white/80 transition cursor-pointer">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-300 text-white flex items-center justify-center shadow-md flex-shrink-0">
+              <span class="text-sm font-bold">{{currentName?.charAt(0)?.toUpperCase()}}</span>
             </div>
-            <div id="helpRow" class="flex justify-between items-center px-2 text-xs text-[#5f7592]">
-                <div class="flex items-center gap-2">
-                    <i class="fa-regular fa-life-ring"></i>
-                    <span class="whitespace-nowrap">Help & training</span>
-                </div>
-                <div class="flex -space-x-1">
-                    <div class="w-5 h-5 rounded-full bg-indigo-100 border border-white flex items-center justify-center text-[9px] font-bold text-indigo-800">N</div>
-                    <div class="w-5 h-5 rounded-full bg-amber-100 border border-white flex items-center justify-center text-[9px] font-bold text-amber-800">K</div>
-                    <div class="w-5 h-5 rounded-full bg-emerald-100 border border-white flex items-center justify-center text-[9px] font-bold text-emerald-800">+3</div>
-                </div>
+            <div *ngIf="!collapsed" class="flex-1 transition-all duration-200">
+              <div class="text-sm font-semibold text-[#1f2a3f] whitespace-nowrap">{{currentName}}</div>
+              <div class="text-[10px] text-[#5c6f88] flex items-center gap-1 whitespace-nowrap">
+                <i class="fas fa-circle text-[8px] text-emerald-500"></i> {{currentJobTitle}}
+              </div>
             </div>
+          </div>
         </div>
-    </aside>
-
-    <!-- mock main panel -->
-    <div class="ml-8 p-6 bg-white/40 backdrop-blur-sm rounded-[32px] border border-white/60 shadow-sm h-[580px] w-64 flex items-center justify-center text-[#6e85a5] text-sm italic">
-        <div class="text-center">
-            <i class="fa-regular fa-window-maximize text-2xl mb-2 opacity-40"></i><br>
-            main content area<br> (ERP workspace)
-        </div>
-    </div>
-
-    <script>
-        (function() {
-            // ---------- MAIN SIDEBAR COLLAPSE (icons only) ----------
-            const sidebar = document.getElementById('sidebar');
-            const toggleBtn = document.getElementById('toggleBtn');
-            const toggleIcon = document.getElementById('toggleIcon');
-
-            const headerText = document.getElementById('headerText');
-            const searchContainer = document.getElementById('searchContainer');
-            const divider = document.getElementById('divider');
-            const userInfo = document.getElementById('userInfo');
-            const helpRow = document.getElementById('helpRow');
-
-            const navTexts = document.querySelectorAll('.nav-text');
-            const navBadges = document.querySelectorAll('.nav-badge');
-            const sectorChevrons = document.querySelectorAll('.sector-chevron');
-
-            let collapsed = false;
-
-            function setSidebarCollapse(state) {
-                collapsed = state;
-                if (collapsed) {
-                    sidebar.style.width = '88px';
-                    sidebar.classList.remove('p-6');
-                    sidebar.classList.add('p-4');
-
-                    if (headerText) headerText.style.display = 'none';
-                    if (searchContainer) searchContainer.style.display = 'none';
-                    if (divider) divider.style.display = 'none';
-                    if (userInfo) userInfo.style.display = 'none';
-                    if (helpRow) helpRow.style.display = 'none';
-
-                    navTexts.forEach(el => el.style.display = 'none');
-                    navBadges.forEach(el => el.style.display = 'none');
-                    sectorChevrons.forEach(el => el.style.display = 'none');
-
-                    toggleIcon.classList.remove('fa-chevron-left');
-                    toggleIcon.classList.add('fa-chevron-right');
-                } else {
-                    sidebar.style.width = '280px';
-                    sidebar.classList.remove('p-4');
-                    sidebar.classList.add('p-6');
-
-                    if (headerText) headerText.style.display = 'flex';
-                    if (searchContainer) searchContainer.style.display = 'flex';
-                    if (divider) divider.style.display = 'block';
-                    if (userInfo) userInfo.style.display = 'block';
-                    if (helpRow) helpRow.style.display = 'flex';
-
-                    navTexts.forEach(el => el.style.display = 'inline-block');
-                    navBadges.forEach(el => el.style.display = 'inline-block');
-                    sectorChevrons.forEach(el => el.style.display = 'inline-block');
-
-                    toggleIcon.classList.remove('fa-chevron-right');
-                    toggleIcon.classList.add('fa-chevron-left');
-                }
-            }
-
-            toggleBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                setSidebarCollapse(!collapsed);
-            });
-
-            // ---------- SECTOR TOGGLE (Finance, HR) smooth ----------
-            const sectorToggles = document.querySelectorAll('.sector-toggle');
-
-            sectorToggles.forEach(toggle => {
-                toggle.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const targetId = this.dataset.target;
-                    const subMenu = document.getElementById(targetId);
-                    if (!subMenu) return;
-
-                    const chevron = this.querySelector('.sector-chevron');
-                    subMenu.classList.toggle('open');
-                    if (chevron) {
-                        chevron.classList.toggle('open');
-                    }
-                });
-            });
-
-            // ---------- ACTIVE LINK MANAGEMENT ----------
-            // Select all possible clickable navigation elements: .nav-link and .sub-link
-            const allNavLinks = document.querySelectorAll('.nav-link, .sub-link');
-
-            // Function to remove active class from all
-            function removeActiveFromAll() {
-                allNavLinks.forEach(link => {
-                    link.classList.remove('nav-active', 'sub-active');
-                    // Also remove any extra styles
-                    link.style.backgroundColor = '';
-                    link.style.color = '';
-                    // Reset icon color if needed (icons are inside spans with classes, they inherit)
-                });
-            }
-
-            // Add click handler to each link
-            allNavLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();  // prevent hash jump, but keep interaction
-
-                    // Remove active from all links
-                    removeActiveFromAll();
-
-                    // Add active class to this link
-                    this.classList.add('nav-active');  // same class works for both, but we can also add sub-active for specificity
-                    // For sub-links, add extra class for distinct style if desired, but nav-active works fine
-
-                    // Optionally, you can also force the parent sector to highlight? we keep it simple.
-                });
-            });
-
-            // Set a default active state (e.g., Dashboard) optional
-            // Uncomment next lines if you want Dashboard active on page load
-            // setTimeout(() => {
-            //     const defaultActive = document.querySelector('[data-nav-id="dashboard"]');
-            //     if (defaultActive) {
-            //         removeActiveFromAll();
-            //         defaultActive.classList.add('nav-active');
-            //     }
-            // }, 10);
-
-
-            // Ensure submenu links also get active style correctly (they have .sub-link)
-            // We can add a special style for sub-active, but nav-active already works.
-            // We'll add a rule for .sub-link.nav-active to make it pop
-            // Already have .nav-active in style, and .sub-link will inherit.
-
-            // initial: no active (or set one)
-            // set Dashboard active as example
-            const dashboardLink = document.querySelector('[data-nav-id="dashboard"]');
-            if (dashboardLink) {
-                removeActiveFromAll();
-                dashboardLink.classList.add('nav-active');
-            }
-
-            // make sure submenu items also look good when active
-        })();
-    </script>
-    <!-- tiny extra style for submenu active item differentiation (optional) -->
-    <style>
-        .sub-link.nav-active {
-            background-color: rgba(255, 255, 255, 0.8);
-            color: #1e3a8a;
-            font-weight: 600;
-            border-left: 3px solid #4f46e5;
-            border-radius: 0 12px 12px 0;
-        }
-    </style>
-</body>
-</html>
+      </aside>

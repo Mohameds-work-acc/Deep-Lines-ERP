@@ -1,54 +1,47 @@
-import { HttpInterceptorFn , HttpErrorResponse} from "@angular/common/http";
-import { catchError, switchMap, throwError } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
 import { AuthService } from '../auth/auth-service';
-import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 
+@Injectable()
+export class AuthTokenInterceptor implements HttpInterceptor {
+  constructor(private authService: AuthService, private router: Router) {}
 
-export const authTokenInterceptor :HttpInterceptorFn = (req, next) => {
+  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    const accessToken = localStorage.getItem('DeepLines_accessToken');
 
+    let authReq = req;
+    if (accessToken) {
+      authReq = req.clone({ setHeaders: { Authorization: `Bearer ${accessToken}` } });
+    }
 
-  const router = inject(Router);
-  const authService = inject(AuthService);
+    return next.handle(authReq).pipe(
+      catchError((error: HttpErrorResponse) => {
+        if (error.status === 401 && this.authService.getRefreshToken()) {
+          return this.authService.refreshToken().pipe(
+            switchMap((res: any) => {
+              const newToken = res?.token;
+              if (newToken) {
+                localStorage.setItem('DeepLines_accessToken', newToken);
+                const newReq = req.clone({ setHeaders: { Authorization: `Bearer ${newToken}` } });
+                return next.handle(newReq);
+              }
+              this.authService.logout();
+              this.router.navigate(['/login']);
+              return throwError(() => error);
+            }),
+            catchError((refreshError) => {
+              this.authService.logout();
+              this.router.navigate(['/login']);
+              return throwError(() => refreshError);
+            })
+          );
+        }
 
-
-  const accessToken = localStorage.getItem('DeepLines_accessToken');
-
-  if (accessToken) {
-    const clonedReq = req.clone({
-      headers: req.headers.set('Authorization', `Bearer ${accessToken}`)
-    });
-    return next(clonedReq);
-  } else {
-    return next(req).pipe(
-    catchError((error: HttpErrorResponse) => {
-      if (error.status === 401 && authService.getRefreshToken()) {
-        // Try to refresh the token once
-        return authService.refreshToken().pipe(
-          switchMap((res) => {
-            const newToken = res.token;
-            if (newToken) {
-              const newReq = req.clone({
-                setHeaders: {
-                  Authorization: `Bearer ${newToken}`,
-                },
-              });
-              return next(newReq);
-            }
-            authService.logout();
-            router.navigate(['/login']);
-            return throwError(() => error);
-          }),
-          catchError((refreshError) => {
-            authService.logout();
-            router.navigate(['/login']);
-            return throwError(() => refreshError);
-          })
-        );
-      }
-
-      return throwError(() => error);
+        return throwError(() => error);
       })
     );
   }
-};
+}

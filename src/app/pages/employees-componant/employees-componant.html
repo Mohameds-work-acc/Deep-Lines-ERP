@@ -1,0 +1,247 @@
+<div class="h-dvh overflow-y-scroll">
+  <div class="employees-container p-6 space-y-6 h-max mb-28">
+
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div>
+        <h1 class="text-3xl font-bold bg-gradient-to-br from-[#1f2a3f] to-[#2c3b50] bg-clip-text text-transparent">
+          Employees Dashboard
+        </h1>
+        <p class="text-[#5c6f88] mt-1 flex items-center gap-2">
+          <i class="fas fa-users text-indigo-400"></i>
+          Manage your workforce efficiently
+        </p>
+      </div>
+    </div>
+
+    <!-- Stats Cards Row -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- Total Employees Card -->
+      <div class="glass-card rounded-2xl p-5 hover:scale-[1.02] transition-transform duration-200">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-[#5c6f88]">Total Employees</p>
+            <h3 class="text-2xl font-bold text-[#1f2a3f] mt-6">{{ employees.length }}</h3>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-indigo-100/80 text-indigo-600 flex items-center justify-center">
+            <i class="fas fa-users text-xl"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Employees Card -->
+      <div class="glass-card rounded-2xl p-5 hover:scale-[1.02] transition-transform duration-200">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-[#5c6f88]">Active Employees</p>
+            <h3 class="text-2xl font-bold text-[#1f2a3f] mt-1">{{ getActiveEmployees() }}</h3>
+            <p class="text-xs text-emerald-600 mt-2 flex items-center gap-1">
+              <i class="fas fa-circle text-[8px] text-emerald-500"></i> {{ getActivePercentage() }}% of total
+            </p>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-emerald-100/80 text-emerald-600 flex items-center justify-center">
+            <i class="fas fa-user-check text-xl"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- On Leave Card -->
+      <div class="glass-card rounded-2xl p-5 hover:scale-[1.02] transition-transform duration-200">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-[#5c6f88]">On Leave</p>
+            <h3 class="text-2xl font-bold text-[#1f2a3f] mt-1">{{ getOnLeaveEmployees() }}</h3>
+            <p class="text-xs text-amber-600 mt-2 flex items-center gap-1">
+              <i class="fas fa-clock"></i> {{ getOnLeavePercentage() }}% of total
+            </p>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-amber-100/80 text-amber-600 flex items-center justify-center">
+            <i class="fas fa-umbrella-beach text-xl"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Departments Card -->
+      <div class="glass-card rounded-2xl p-5 hover:scale-[1.02] transition-transform duration-200">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-[#5c6f88]">Departments</p>
+            <h3 class="text-2xl font-bold text-[#1f2a3f] mt-1">{{ getUniqueDepartments() }}</h3>
+            <p class="text-xs text-indigo-600 mt-2 flex items-center gap-1">
+              <i class="fas fa-building"></i> Active departments
+            </p>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-purple-100/80 text-purple-600 flex items-center justify-center">
+            <i class="fas fa-sitemap text-xl"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+
+      <!-- Add Button -->
+      <button
+        (click)="showEmployeeForm()"
+        class="glass-button px-6 py-3 rounded-2xl text-sm text-white font-medium flex items-center gap-2 bg-indigo-500/80 hover:bg-indigo-600/90 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+        [disabled]="loading"
+      >
+        <i class="fas fa-plus-circle"></i>
+        <span>Add Employee</span>
+      </button>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div *ngIf="loading" class="flex justify-center py-8">
+      <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Search and Filter Bar -->
+    <div *ngIf="!loading" class="glass-card rounded-2xl p-4 flex flex-col sm:flex-row gap-4 items-center justify-between">
+      <div class="flex items-center gap-3 bg-white/70 rounded-2xl py-2.5 px-4 border border-white/90 w-full sm:w-80 focus-within:ring-2 ring-indigo-200/70 transition-all">
+        <i class="fas fa-search text-sm text-[#5b6f88]"></i>
+        <input
+          type="text"
+          placeholder="Search employees..."
+          class="w-full bg-transparent outline-none text-sm text-[#1f2a3f] placeholder-[#8a9bb5]"
+          (input)="onSearch($event)"
+        >
+      </div>
+
+      <div class="flex gap-3 w-full sm:w-auto">
+        <select
+          class="glass-dropdown px-4 py-2.5 rounded-xl text-sm text-[#1f2a3f] bg-white/70 border border-white/90 outline-none focus:ring-2 ring-indigo-200/70"
+          (change)="filterByDepartment($event)"
+        >
+          <option value="">All Departments</option>
+          <option *ngFor="let dept of departments" [value]="dept">{{ dept }}</option>
+        </select>
+
+        <select
+          class="glass-dropdown px-4 py-2.5 rounded-xl text-sm text-[#1f2a3f] bg-white/70 border border-white/90 outline-none focus:ring-2 ring-indigo-200/70"
+          (change)="filterByStatus($event)"
+        >
+          <option value="">All Status</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+          <option value="on leave">On Leave</option>
+        </select>
+      </div>
+    </div>
+      <div class="w-280 overflow-scroll">
+        <!-- Employees Table -->
+        <div *ngIf="!loading" class="glass-card rounded-3xl w-max">
+          <div class="w-max">
+            <table style="width: 1rem;" class="employees-table ">
+              <thead class="bg-white/40 backdrop-blur-sm">
+                <tr>
+                  <th class="px-6 py-4 text-left text-xs font-semibold text-[#5c6f88] uppercase tracking-wider">ID</th>
+                  <th class="px-6 py-4 text-left text-xs font-semibold text-[#5c6f88] uppercase tracking-wider">Employee</th>
+                  <th class="px-6 py-4 text-left text-xs font-semibold text-[#5c6f88] uppercase tracking-wider">Email</th>
+                  <th class="px-6 py-4 text-left text-xs font-semibold text-[#5c6f88] uppercase tracking-wider">Phone</th>
+                  <th class="px-6 py-4 text-left text-xs font-semibold text-[#5c6f88] uppercase tracking-wider">Department</th>
+                  <th class="px-6 py-4 text-left text-xs font-semibold text-[#5c6f88] uppercase tracking-wider">Job Title</th>
+                  <th class="px-6 py-4 text-left text-xs font-semibold text-[#5c6f88] uppercase tracking-wider">Role</th>
+                  <th class="px-6 py-4 text-left text-xs font-semibold text-[#5c6f88] uppercase tracking-wider">Joined</th>
+                  <th class="px-6 py-4 text-left text-xs font-semibold text-[#5c6f88] uppercase tracking-wider">Status</th>
+                  <th class="px-6 py-4 text-left text-xs font-semibold text-[#5c6f88] uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-white/30">
+                <tr *ngFor="let e of filteredEmployees" class="hover:bg-white/40 transition-all duration-200 group">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="text-sm font-medium text-[#4f46e5]">#{{ e.id }}</span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center gap-3">
+                      <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-300 text-white flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                        <span class="text-sm font-bold">{{ getInitials(e.name) }}</span>
+                      </div>
+                      <span class="text-sm font-medium text-[#1f2a3f]">{{ e.name }}</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center gap-2">
+                      <i class="fas fa-envelope text-[10px] text-indigo-400"></i>
+                      <span class="text-sm text-[#5c6f88]">{{ e.email }}</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center gap-2">
+                      <i class="fas fa-phone text-[10px] text-indigo-400"></i>
+                      <span class="text-sm text-[#5c6f88]">{{ e.phone }}</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="text-sm text-[#1f2a3f]">{{ e.department }}</span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="text-sm text-[#1f2a3f]">{{ e.jopTitle }}</span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-3 py-1 text-xs rounded-full bg-indigo-100/80 text-indigo-700">
+                      {{ e.role }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center gap-2">
+                      <i class="far fa-calendar text-[10px] text-indigo-400"></i>
+                      <span class="text-sm text-[#5c6f88]">{{ e.joinedDate | date:'MMM d, y' }}</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span
+                      class="px-3 py-1 text-xs rounded-full"
+                      [ngClass]="{
+                        'bg-emerald-100/80 text-emerald-700': e.status === 'active',
+                        'bg-amber-100/80 text-amber-700': e.status === 'on leave',
+                        'bg-rose-100/80 text-rose-700': e.status === 'inactive'
+                      }"
+                    >
+                      {{ e.status || 'active' }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center gap-2">
+                      <button
+                        (click)="showEmployeeForm(e)"
+                        class="w-9 h-9 rounded-xl bg-indigo-100/80 text-indigo-600 hover:bg-indigo-200 transition-all duration-200 flex items-center justify-center transform hover:scale-110 hover:rotate-3"
+                        title="Edit employee"
+                      >
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button
+                        (click)="confirmDelete(e.id)"
+                        class="w-9 h-9 rounded-xl bg-rose-100/80 text-rose-600 hover:bg-rose-200 transition-all duration-200 flex items-center justify-center transform hover:scale-110 hover:-rotate-3"
+                        title="Delete employee"
+                      >
+                        <i class="fas fa-trash-alt"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Empty State -->
+                <tr *ngIf="filteredEmployees.length === 0">
+                  <td colspan="10" class="px-6 py-16 text-center">
+                    <div class="flex flex-col items-center gap-4">
+                      <div class="w-20 h-20 rounded-3xl bg-gradient-to-br from-indigo-100 to-indigo-200 flex items-center justify-center">
+                        <i class="fas fa-users text-3xl text-indigo-400"></i>
+                      </div>
+                      <p class="text-lg text-[#5c6f88]">No employees found</p>
+                      <p class="text-sm text-[#8a9bb5]">Get started by adding your first employee</p>
+                      <button
+                        (click)="showEmployeeForm()"
+                        class="mt-2 px-6 py-3 rounded-2xl bg-indigo-500/80 text-white font-medium hover:bg-indigo-600/90 transition-all duration-200 flex items-center gap-2"
+                      >
+                        <i class="fas fa-plus-circle"></i>
+                        Add Your First Employee
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
