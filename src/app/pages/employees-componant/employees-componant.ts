@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EmployeeService } from '../../services/employee.service';
@@ -23,7 +23,7 @@ export class EmployeesComponant implements OnInit {
   departments = ['Engineering', 'Sales', 'Marketing', 'HR', 'Finance', 'Operations', 'IT'];
   statuses = ['active', 'inactive', 'on leave'];
 
-  constructor(private employeeService: EmployeeService) {}
+  constructor(private employeeService: EmployeeService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.loadEmployees();
@@ -36,11 +36,13 @@ export class EmployeesComponant implements OnInit {
         this.employees = res || [];
         this.filteredEmployees = [...this.employees];
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.employees = [];
         this.filteredEmployees = [];
         this.loading = false;
+        this.cdr.detectChanges();
         Swal.fire('Error', 'Failed to load employees', 'error');
       }
     });
@@ -117,7 +119,7 @@ export class EmployeesComponant implements OnInit {
           <input id="swal-Email" class="swal2-input" placeholder="Email *" type="email" value="${employee?.email || ''}" style="margin-bottom: 8px;">
           <input id="swal-Phone" class="swal2-input" placeholder="Phone *" value="${employee?.phone || ''}" style="margin-bottom: 8px;">
           <input id="swal-Address" class="swal2-input" placeholder="Address" value="${employee?.address || ''}" style="margin-bottom: 8px;">
-          <input id="swal-Password" class="swal2-input" placeholder="Password" type="password" value="${employee?.password || ''}" style="margin-bottom: 8px;">
+          <input id="swal-Password" class="swal2-input" placeholder="Password" type="password" value="12345678" style="margin-bottom: 8px;" hidden>
 
           <select id="swal-department" class="swal2-input" style="margin-bottom: 8px;">
             <option value="">Select Department *</option>

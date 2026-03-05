@@ -6,6 +6,7 @@ import { authGuard } from './auth/auth-guard/auth-guard-guard';
 import { loginGuard } from './auth/login-guard/login-guard-guard';
 import { DashboardComponant } from './pages/dashboard-componant/dashboard-componant';
 import { EmployeesComponant } from './pages/employees-componant/employees-componant';
+import { BlogsComponant } from './pages/blogs-componant/blogs-componant';
 
 export const routes: Routes = [
   {
@@ -24,7 +25,8 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: DashboardComponant },
-      { path: 'employees', component: EmployeesComponant }
+      { path: 'employees', component: EmployeesComponant },
+      { path: 'blogs', component: BlogsComponant }
     ]
   },
 

@@ -1,7 +1,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <aside
         [ngClass]="{'w-[88px] p-4': collapsed, 'w-[280px] p-6': !collapsed}"
-        class="h-full sidebar-transition bg-white/60 backdrop-blur-xl backdrop-saturate-150 rounded-[36px] border border-white/50 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] flex flex-col gap-4 relative overflow-visible flex-shrink-0"
+        class="h-full sidebar-transition bg-white/60 backdrop-blur-xl backdrop-saturate-150 rounded-[36px] border border-white/50 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] flex flex-col gap-4 relative overflow-y-auto overflow-x-hidden flex-shrink-0"
       >
         <!-- toggle button -->
         <button
@@ -31,7 +31,7 @@
         <nav class="flex flex-col gap-2 mt-1">
           <!-- Dashboard -->
           <a
-            href="#"
+            routerLink="dashboard"
             (click)="setActiveLink('dashboard')"
             [ngClass]="{'nav-active': activeLink === 'dashboard'}"
             class="nav-link flex items-center gap-4 px-4 py-3 rounded-2xl text-[#1f2a3f] font-medium transition-all duration-200 hover:bg-white/70 hover:shadow-sm active:scale-[0.98] group"
@@ -78,12 +78,13 @@
             >
               <span class="w-5 text-[#4b6589] group-hover:text-indigo-700 flex-shrink-0"><i class="fas fa-users"></i></span>
               <span *ngIf="!collapsed" class="nav-text text-sm whitespace-nowrap">Human resources</span>
-              <span *ngIf="!collapsed" class="nav-badge ml-auto text-[10px] bg-amber-100/80 text-amber-800 px-2 py-0.5 rounded-full border border-white/50 whitespace-nowrap">2</span>
+              
               <i *ngIf="!collapsed" class="sector-chevron fas fa-chevron-right text-xs ml-1 text-[#6a7f9b]" [ngClass]="{'open': openSectors.hr}"></i>
             </div>
             <div *ngIf="!collapsed" class="submenu-collapsible pl-12 pr-2 flex flex-col gap-1 mt-1" [ngClass]="{'open': openSectors.hr}">
               <a
                 routerLink="employees"
+                (click)="setActiveLink('employees')"
                 [ngClass]="{'nav-active': activeLink === 'employees'}"
                 class="sub-link block py-2 text-sm text-[#3e5470] hover:text-indigo-700 transition rounded-xl px-3 hover:bg-white/60 whitespace-nowrap"
               >— Employees</a>
@@ -102,6 +103,42 @@
                 [ngClass]="{'nav-active': activeLink === 'hr-timeoff'}"
                 class="sub-link block py-2 text-sm text-[#3e5470] hover:text-indigo-700 transition rounded-xl px-3 hover:bg-white/60 whitespace-nowrap"
               >— Time off</a>
+            </div>
+          </div>
+
+          <!-- Content Creators SECTOR -->
+          <div class="sector-group">
+            <div
+              (click)="toggleSector('contentCreators')"
+              class="sector-toggle flex items-center gap-4 px-4 py-3 rounded-2xl text-[#1f2a3f] font-medium cursor-pointer hover:bg-white/70 transition-all duration-200 group"
+            >
+              <span class="w-5 text-[#4b6589] group-hover:text-indigo-700 flex-shrink-0"><i class="fa-brands fa-blogger"></i></span>
+              <span *ngIf="!collapsed" class="nav-text text-sm whitespace-nowrap">Content Creators</span>
+              
+              <i *ngIf="!collapsed" class="sector-chevron fas fa-chevron-right text-xs ml-1 text-[#6a7f9b]" [ngClass]="{'open': openSectors.contentCreators}"></i>
+            </div>
+            <div *ngIf="!collapsed" class="submenu-collapsible pl-12 pr-2 flex flex-col gap-1 mt-1" [ngClass]="{'open': openSectors.contentCreators}">
+              <a
+                routerLink="blogs"
+                (click)="setActiveLink('blogs')"
+                [ngClass]="{'nav-active': activeLink === 'blogs'}"
+                class="cursor-pointer sub-link block py-2 text-sm text-[#3e5470] hover:text-indigo-700 transition rounded-xl px-3 hover:bg-white/60 whitespace-nowrap"
+              >— Blogs</a>
+              <a
+                (click)="setActiveLink('projects')"
+                [ngClass]="{'nav-active': activeLink === 'projects'}"
+                class="cursor-pointer sub-link block py-2 text-sm text-[#3e5470] hover:text-indigo-700 transition rounded-xl px-3 hover:bg-white/60 whitespace-nowrap"
+              >— Projects</a>
+              <a
+                (click)="setActiveLink('sectors')"
+                [ngClass]="{'nav-active': activeLink === 'sectors'}"
+                class="cursor-pointer sub-link block py-2 text-sm text-[#3e5470] hover:text-indigo-700 transition rounded-xl px-3 hover:bg-white/60 whitespace-nowrap"
+              >— Sectors</a>
+              <a
+                (click)="setActiveLink('Categories')"
+                [ngClass]="{'nav-active': activeLink === 'Categories'}"
+                class="cursor-pointer sub-link block py-2 text-sm text-[#3e5470] hover:text-indigo-700 transition rounded-xl px-3 hover:bg-white/60 whitespace-nowrap"
+              >— Categories</a>
             </div>
           </div>
         </nav>

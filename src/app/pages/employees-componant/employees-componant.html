@@ -191,9 +191,9 @@
                     <span
                       class="px-3 py-1 text-xs rounded-full"
                       [ngClass]="{
-                        'bg-emerald-100/80 text-emerald-700': e.status === 'active',
-                        'bg-amber-100/80 text-amber-700': e.status === 'on leave',
-                        'bg-rose-100/80 text-rose-700': e.status === 'inactive'
+                        'bg-emerald-100/80 text-emerald-700': e.status.toLowerCase() === 'active',
+                        'bg-amber-100/80 text-amber-700': e.status.toLowerCase() === 'on leave',
+                        'bg-rose-100/80 text-rose-700': e.status.toLowerCase() === 'inactive'
                       }"
                     >
                       {{ e.status || 'active' }}

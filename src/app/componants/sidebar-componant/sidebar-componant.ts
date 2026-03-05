@@ -26,14 +26,15 @@ export class SidebarComponant {
   activeLink = 'dashboard'; // default active
   openSectors = {
     finance: false,
-    hr: false
+    hr: false,
+    contentCreators: false
   };
 
   toggleSidebar() {
     this.collapsed = !this.collapsed;
   }
 
-  toggleSector(sector: 'finance' | 'hr') {
+  toggleSector(sector: 'finance' | 'hr' | 'contentCreators') {
     this.openSectors[sector] = !this.openSectors[sector];
   }
 
