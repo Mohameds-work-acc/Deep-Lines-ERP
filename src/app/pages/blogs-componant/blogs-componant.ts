@@ -64,7 +64,7 @@ export class BlogsComponant implements OnInit {
       title: isEdit ? '✏️ Edit Blog' : '➕ Add New Blog',
       html: `
         <input id="swal-title" class="swal2-input" placeholder="Title" value="${blog?.title || ''}">
-        <input id="swal-image" class="swal2-input" placeholder="Image URL" value="${blog?.imageUrl || ''}">
+        <input id="swal-image-file" type="file" class="swal2-input" style="padding:6px;">
         <textarea id="swal-content" class="swal2-textarea" placeholder="Content">${blog?.content || ''}</textarea>
         <input id="swal-pubdate" type="datetime-local" class="swal2-input" value="${blog ? new Date(blog.published_date).toISOString().slice(0,16) : new Date().toISOString().slice(0,16)}">
       `,
@@ -78,29 +78,47 @@ export class BlogsComponant implements OnInit {
 
     if (isConfirmed && formValues !== undefined) {
       const get = (id: string) => (document.getElementById(id) as HTMLInputElement | HTMLTextAreaElement)?.value;
-      const payload: any = {
-        title: get('swal-title'),
-        imageUrl: get('swal-image'),
-        content: get('swal-content'),
-        published_date: new Date(get('swal-pubdate')).toISOString(),
-        User_Id: this.authService.getUserId(),
-        updatedBy: this.authService.getUserId()
-      };
+      const fileInput = (document.getElementById('swal-image-file') as HTMLInputElement);
+      const file = fileInput?.files && fileInput.files.length ? fileInput.files[0] : null;
+
+      const formData = new FormData();
+      formData.append('title', get('swal-title'));
+      formData.append('content', get('swal-content'));
+      formData.append('published_date', new Date(get('swal-pubdate')).toISOString());
+      // backend expects User_Id and updatedBy as integers
+      formData.append('User_Id', String(this.authService.getUserId()));
+      formData.append('updatedBy', String(this.authService.getUserId()));
+      // If a file was selected, append under 'image' to match IFormFile name
+      if (file) {
+        formData.append('image', file, file.name);
+      } else {
+        // If no file selected but an image URL input provided, send imageUrl so backend can keep it
+        const imageUrl = get('swal-image');
+        if (imageUrl) {
+          formData.append('imageUrl', imageUrl);
+        }
+      }
 
       try {
         this.loading = true;
         if (isEdit && blog) {
-          await this.blogService.update(blog.id, payload).toPromise();
-          Swal.fire('Updated!', 'Blog updated.', 'success');
+          const res: any = await this.blogService.update(blog.id, formData).toPromise();
+          this.loading = false;
+          const successMsg = res && res.message ? res.message : 'Blog updated.';
+          Swal.fire('Updated!', successMsg, 'success');
         } else {
-          await this.blogService.create(payload).toPromise();
-          Swal.fire('Created!', 'Blog created.', 'success');
+          const res: any = await this.blogService.create(formData).toPromise();
+
+          this.loading = false;
+          const successMsg = res && res.message ? res.message : 'Blog created.';
+          Swal.fire('Created!', successMsg, 'success');
         }
         this.loadBlogs();
-      } catch (err) {
+      } catch (err: any) {
         this.loading = false;
         this.cdr.detectChanges();
-        Swal.fire('Error', 'Operation failed. Please try again.', 'error');
+        const apiMessage = err && err.error && err.error.message ? err.error.message : (err instanceof Error ? err.message : 'Operation failed. Please try again.');
+        Swal.fire('Error', apiMessage, 'error');
       }
     }
   }

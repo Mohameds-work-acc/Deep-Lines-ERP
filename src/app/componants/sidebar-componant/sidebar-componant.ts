@@ -17,7 +17,7 @@ export class SidebarComponant {
 
     this.currentName = this.authService.getUserFullName() || null;
 
-    this.currentRole = this.authService.getUserRole() || null;
+    this.currentRole = this.authService.getUserDepartment() || null;
 
     this.currentJobTitle = this.authService.getUserJobTitle() || null;
 

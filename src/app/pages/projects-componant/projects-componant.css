@@ -1,0 +1,5 @@
+.page { padding: 12px; }
+.header { display:flex; justify-content:space-between; align-items:center; gap:12px }
+.card { border:1px solid #e5e7eb; padding:12px; margin:8px 0; border-radius:6px }
+.actions { margin-top:8px }
+.actions button { margin-right:8px }

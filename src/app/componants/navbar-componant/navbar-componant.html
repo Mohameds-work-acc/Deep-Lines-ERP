@@ -1,13 +1,9 @@
 <!-- GLASS NAVBAR (matching sidebar theme) -->
     <nav class="navbar-glass mx-6 mt-5 px-6 py-3 rounded-[32px] flex items-center justify-between relative z-50">
       <!-- left side: page title + breadcrumb -->
-      <div class="flex items-center gap-4">
+      <div class="flex items-center gap-4 ">
         <div class="flex items-center gap-2 text-sm">
-          <a href="#" class="text-[#5b6f88] hover:text-indigo-700 transition"><i class="fas fa-home"></i></a>
-          <i class="fas fa-chevron-right text-[10px] text-[#8a9bb5]"></i>
-          <span class="text-[#1f2a3f] font-medium">Dashboard</span>
-          <i class="fas fa-chevron-right text-[10px] text-[#8a9bb5]"></i>
-          <span class="text-indigo-700 font-semibold">Analytics</span>
+          
         </div>
 
       </div>
@@ -58,12 +54,12 @@
 
             <!-- profile link -->
             <a
-              href="#"
+              routerLink="auth/change_password"
               class="flex items-center gap-3 px-4 py-2.5 text-sm text-[#1f2a3f] hover:bg-white/70 transition"
-              (click)="onProfile($event)"
+              
             >
-              <i class="far fa-user w-4 text-indigo-500"></i>
-              <span>Your Profile</span>
+              <i class="fa-solid fa-key w-4 text-indigo-500"></i>
+              <span>Change Password</span>
             </a>
           </div>
         </div>

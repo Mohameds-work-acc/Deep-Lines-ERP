@@ -2,11 +2,12 @@ import { Component, HostListener } from '@angular/core';
 
 import { CommonModule } from '@angular/common'
 import { AuthService } from '../../auth/auth-service';
+import { Router, RouterLink } from '@angular/router';
 
 
 @Component({
   selector: 'app-navbar-componant',
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './navbar-componant.html',
   styleUrl: './navbar-componant.css',
 })
@@ -15,7 +16,7 @@ export class NavbarComponant {
   isUserMenuOpen = false;
   currentName: string | null = null;
   currentEmail: string | null = null;
-  constructor(private authService: AuthService) {
+  constructor(private authService: AuthService , private router: Router) {
     this.currentName = this.authService.getUserFullName() || null;
     this.currentEmail = this.authService.getUserEmail() || null;
   }
@@ -26,6 +27,7 @@ export class NavbarComponant {
 
   onSettings(event: Event) {
     event.preventDefault();
+    
     console.log('Navigate to settings');
     // Add your navigation logic here
     this.isUserMenuOpen = false;
@@ -33,17 +35,11 @@ export class NavbarComponant {
 
   onLogout(event: Event) {
     event.preventDefault();
-    console.log('Logout user');
-    // Add your logout logic here
+    this.authService.logout();
     this.isUserMenuOpen = false;
+    this.router.navigate(['/login']);
   }
 
-  onProfile(event: Event) {
-    event.preventDefault();
-    console.log('Navigate to profile');
-    // Add your navigation logic here
-    this.isUserMenuOpen = false;
-  }
   @HostListener('document:click', ['$event'])
 onDocumentClick(event: MouseEvent) {
   const target = event.target as HTMLElement;

@@ -33,7 +33,7 @@ export class LoginComponant {
             this.loading = false;
             this.cdr.detectChanges();
             this.sharedService.showToast(res.message, 'success');
-            this.router.navigate(['/dashboard']);
+            this.router.navigate(['/blogs']);
           }
           ,
           error: (err) => {

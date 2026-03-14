@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { EmployeeService } from '../../services/employee.service';
 import { Employee } from '../../models/employee.model';
 import Swal from 'sweetalert2';
-
+import { AuthService } from '../../auth/auth-service';
 @Component({
   selector: 'app-employees-componant',
   standalone: true,
@@ -20,10 +20,10 @@ export class EmployeesComponant implements OnInit {
   selectedDepartment = '';
   selectedStatus = '';
 
-  departments = ['Engineering', 'Sales', 'Marketing', 'HR', 'Finance', 'Operations', 'IT'];
+  departments = ['Content Creation' , 'Administration'];
   statuses = ['active', 'inactive', 'on leave'];
 
-  constructor(private employeeService: EmployeeService, private cdr: ChangeDetectorRef) {}
+  constructor(private employeeService: EmployeeService, private cdr: ChangeDetectorRef , private authService: AuthService) {}
 
   ngOnInit(): void {
     this.loadEmployees();
@@ -107,7 +107,33 @@ export class EmployeesComponant implements OnInit {
       return matchesSearch && matchesDepartment && matchesStatus;
     });
   }
+  resetEmployeePassword(id: number) {
+    this.authService.resetPassword(id).subscribe({
+      next: (res:any) => {
+        Swal.fire({
+          title: 'Password Reset',
+          text: 'Employee password has been reset successfully. The new password is "' + res.newPassword + '". Please advise the employee to change it after logging in.',
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false,
+          toast: true,
+          position: 'top-end'
+        });
+      },
+      error: () => {
+        Swal.fire({
+          title: 'Error',
+          text: 'Failed to reset employee password.',
+          icon: 'error',
+          timer: 2000,
+          showConfirmButton: false,
+          toast: true,
+          position: 'top-end'
+        });
+      }
+    });
 
+  }
   async showEmployeeForm(employee?: Employee) {
     const isEdit = !!employee;
 
@@ -116,7 +142,7 @@ export class EmployeesComponant implements OnInit {
       html: `
         <div class="swal-form-container" style="max-height: 70vh; overflow-y: auto; padding: 10px;">
           <input id="swal-Name" class="swal2-input" placeholder="Full Name *" value="${employee?.name || ''}" style="margin-bottom: 8px;">
-          <input id="swal-Email" class="swal2-input" placeholder="Email *" type="email" value="${employee?.email || ''}" style="margin-bottom: 8px;">
+          <input id="swal-Email" class="swal2-input " placeholder="Email *" type="email" ${isEdit ? 'disabled readonly style="background-color: #f3f4f6; border-color: #d1d5db;"' : ''} value="${employee?.email || ''}" style="margin-bottom: 8px;">
           <input id="swal-Phone" class="swal2-input" placeholder="Phone *" value="${employee?.phone || ''}" style="margin-bottom: 8px;">
           <input id="swal-Address" class="swal2-input" placeholder="Address" value="${employee?.address || ''}" style="margin-bottom: 8px;">
           <input id="swal-Password" class="swal2-input" placeholder="Password" type="password" value="12345678" style="margin-bottom: 8px;" hidden>
@@ -127,7 +153,6 @@ export class EmployeesComponant implements OnInit {
           </select>
 
           <input id="swal-jopTitle" class="swal2-input" placeholder="Job Title *" value="${employee?.jopTitle || ''}" style="margin-bottom: 8px;">
-          <input id="swal-Role" class="swal2-input" placeholder="Role *" value="${employee?.role || ''}" style="margin-bottom: 8px;">
 
           <select id="swal-status" class="swal2-input" style="margin-bottom: 8px;">
             <option value="">Select Status</option>
@@ -142,8 +167,10 @@ export class EmployeesComponant implements OnInit {
             <option value="part-time" ${employee?.employmentType === 'part-time' ? 'selected' : ''}>Part Time</option>
             <option value="contract" ${employee?.employmentType === 'contract' ? 'selected' : ''}>Contract</option>
           </select>
-
+        <div class="flex gap-4 items-center">
+          <p> <label for="swal-joinedDate">Joined Date:</label> </p>
           <input id="swal-joinedDate" type="date" class="swal2-input" value="${employee ? new Date(employee.joinedDate).toISOString().slice(0,10) : new Date().toISOString().slice(0,10)}" style="margin-bottom: 8px;">
+          </div>
         </div>
       `,
       focusConfirm: false,
@@ -189,7 +216,6 @@ export class EmployeesComponant implements OnInit {
           Address: get('swal-Address'),
           Password: get('swal-Password'),
           status: status || 'active',
-          Role: get('swal-Role') || 'Employee',
           department: dept,
           jopTitle: get('swal-jopTitle') || 'Staff',
           employmentType: empType || 'full-time',
@@ -225,12 +251,12 @@ export class EmployeesComponant implements OnInit {
           });
         }
         this.loadEmployees();
-      } catch (err) {
+      } catch (err: any) {
         this.loading = false;
         Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: 'Operation failed. Please try again.',
+          text: err.error?.message || 'Operation failed. Please try again.',
           background: 'rgba(255, 255, 255, 0.95)',
           customClass: { popup: 'glass-swal-popup' }
         });

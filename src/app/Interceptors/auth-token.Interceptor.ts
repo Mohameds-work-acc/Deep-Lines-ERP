@@ -7,41 +7,65 @@ import { Router } from '@angular/router';
 
 @Injectable()
 export class AuthTokenInterceptor implements HttpInterceptor {
+
   constructor(private authService: AuthService, private router: Router) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const accessToken = localStorage.getItem('DeepLines_accessToken');
+    const accessTokenExpire = localStorage.getItem('DeepLines_accessTokenExpire');
 
-    let authReq = req;
-    if (accessToken) {
-      authReq = req.clone({ setHeaders: { Authorization: `Bearer ${accessToken}` } });
+
+    const url = req.url || '';
+    if (url.includes('/Auth/refresh') || url.includes('/Auth/login')) {
+      return next.handle(req);
     }
 
-    return next.handle(authReq).pipe(
-      catchError((error: HttpErrorResponse) => {
-        if (error.status === 401 && this.authService.getRefreshToken()) {
-          return this.authService.refreshToken().pipe(
-            switchMap((res: any) => {
-              const newToken = res?.token;
-              if (newToken) {
-                localStorage.setItem('DeepLines_accessToken', newToken);
-                const newReq = req.clone({ setHeaders: { Authorization: `Bearer ${newToken}` } });
-                return next.handle(newReq);
-              }
-              this.authService.logout();
-              this.router.navigate(['/login']);
-              return throwError(() => error);
-            }),
-            catchError((refreshError) => {
-              this.authService.logout();
-              this.router.navigate(['/login']);
-              return throwError(() => refreshError);
-            })
-          );
-        }
+    let authReq = req;
 
-        return throwError(() => error);
-      })
-    );
+    if (accessToken && accessTokenExpire) {
+
+      const now = Date.now();
+      const expireTime = new Date(accessTokenExpire).getTime();
+
+      if (expireTime > now) {
+        authReq = req.clone({
+          setHeaders: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        return next.handle(authReq).pipe(
+          catchError((err) => {
+            if (err instanceof HttpErrorResponse && err.status === 401) {
+              this.router.navigate(['/auth/login']);
+            }
+            return throwError(() => err);
+          })
+        );
+
+      } else {
+        console.log("refresh token ...");
+        return this.authService.refreshToken().pipe(
+          switchMap((tokens) => {
+            this.authService.storeTokens(tokens);
+
+            const newAuthReq = req.clone({
+              setHeaders: {
+                Authorization: `Bearer ${tokens.jwtToken}`,
+              },
+            });
+
+            return next.handle(newAuthReq);
+          }),
+
+          catchError((err) => {
+            this.router.navigate(['/auth/login']);
+            return throwError(() => err);
+          })
+        );
+      }
+    }
+
+    return next.handle(req);
   }
 }

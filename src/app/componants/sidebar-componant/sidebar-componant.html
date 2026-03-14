@@ -29,82 +29,18 @@
 
         <!-- PRIMARY NAV -->
         <nav class="flex flex-col gap-2 mt-1">
-          <!-- Dashboard -->
-          <a
-            routerLink="dashboard"
-            (click)="setActiveLink('dashboard')"
-            [ngClass]="{'nav-active': activeLink === 'dashboard'}"
+          @if (currentRole === 'Administration') {
+            <a
+            routerLink="employees"
+            (click)="setActiveLink('employees')"
+            [ngClass]="{'nav-active': activeLink === 'employees'}"
             class="nav-link flex items-center gap-4 px-4 py-3 rounded-2xl text-[#1f2a3f] font-medium transition-all duration-200 hover:bg-white/70 hover:shadow-sm active:scale-[0.98] group"
           >
-            <span class="w-5 text-[#4b6589] group-hover:text-indigo-700 transition flex-shrink-0"><i class="fas fa-chart-pie"></i></span>
-            <span *ngIf="!collapsed" class="nav-text text-sm whitespace-nowrap">Dashboard</span>
-            <span *ngIf="!collapsed" class="nav-badge ml-auto bg-indigo-100 text-indigo-800 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-white/60 whitespace-nowrap">live</span>
+            <span class="w-5 text-[#4b6589] group-hover:text-indigo-700 transition flex-shrink-0"><i class="fas fa-users"></i></span>
+            <span *ngIf="!collapsed" class="nav-text text-sm whitespace-nowrap">Employees</span>
           </a>
-
-          <!-- FINANCE SECTOR -->
-          <div class="sector-group">
-            <div
-              (click)="toggleSector('finance')"
-              class="sector-toggle flex items-center gap-4 px-4 py-3 rounded-2xl text-[#1f2a3f] font-medium cursor-pointer hover:bg-white/70 transition-all duration-200 group"
-            >
-              <span class="w-5 text-[#4b6589] group-hover:text-indigo-700 flex-shrink-0"><i class="fa-solid fa-coins"></i></span>
-              <span *ngIf="!collapsed" class="nav-text text-sm whitespace-nowrap">Finance</span>
-              <i *ngIf="!collapsed" class="sector-chevron fas fa-chevron-right text-xs ml-auto text-[#6a7f9b]" [ngClass]="{'open': openSectors.finance}"></i>
-            </div>
-            <div *ngIf="!collapsed" class="submenu-collapsible pl-12 pr-2 flex flex-col gap-1 mt-1" [ngClass]="{'open': openSectors.finance}">
-              <a
-                (click)="setActiveLink('finance-invoices')"
-                [ngClass]="{'nav-active': activeLink === 'finance-invoices'}"
-                class="sub-link block py-2 text-sm text-[#3e5470] hover:text-indigo-700 transition rounded-xl px-3 hover:bg-white/60 whitespace-nowrap"
-              >— Invoices</a>
-              <a
-                (click)="setActiveLink('finance-payments')"
-                [ngClass]="{'nav-active': activeLink === 'finance-payments'}"
-                class="sub-link block py-2 text-sm text-[#3e5470] hover:text-indigo-700 transition rounded-xl px-3 hover:bg-white/60 whitespace-nowrap"
-              >— Payments</a>
-              <a
-                (click)="setActiveLink('finance-reports')"
-                [ngClass]="{'nav-active': activeLink === 'finance-reports'}"
-                class="sub-link block py-2 text-sm text-[#3e5470] hover:text-indigo-700 transition rounded-xl px-3 hover:bg-white/60 whitespace-nowrap"
-              >— Reports</a>
-            </div>
-          </div>
-
-          <!-- HR SECTOR -->
-          <div class="sector-group">
-            <div
-              (click)="toggleSector('hr')"
-              class="sector-toggle flex items-center gap-4 px-4 py-3 rounded-2xl text-[#1f2a3f] font-medium cursor-pointer hover:bg-white/70 transition-all duration-200 group"
-            >
-              <span class="w-5 text-[#4b6589] group-hover:text-indigo-700 flex-shrink-0"><i class="fas fa-users"></i></span>
-              <span *ngIf="!collapsed" class="nav-text text-sm whitespace-nowrap">Human resources</span>
-              
-              <i *ngIf="!collapsed" class="sector-chevron fas fa-chevron-right text-xs ml-1 text-[#6a7f9b]" [ngClass]="{'open': openSectors.hr}"></i>
-            </div>
-            <div *ngIf="!collapsed" class="submenu-collapsible pl-12 pr-2 flex flex-col gap-1 mt-1" [ngClass]="{'open': openSectors.hr}">
-              <a
-                routerLink="employees"
-                (click)="setActiveLink('employees')"
-                [ngClass]="{'nav-active': activeLink === 'employees'}"
-                class="sub-link block py-2 text-sm text-[#3e5470] hover:text-indigo-700 transition rounded-xl px-3 hover:bg-white/60 whitespace-nowrap"
-              >— Employees</a>
-              <a
-                (click)="setActiveLink('hr-payroll')"
-                [ngClass]="{'nav-active': activeLink === 'hr-payroll'}"
-                class="sub-link block py-2 text-sm text-[#3e5470] hover:text-indigo-700 transition rounded-xl px-3 hover:bg-white/60 whitespace-nowrap"
-              >— Payroll</a>
-              <a
-                (click)="setActiveLink('hr-recruitment')"
-                [ngClass]="{'nav-active': activeLink === 'hr-recruitment'}"
-                class="sub-link block py-2 text-sm text-[#3e5470] hover:text-indigo-700 transition rounded-xl px-3 hover:bg-white/60 whitespace-nowrap"
-              >— Recruitment</a>
-              <a
-                (click)="setActiveLink('hr-timeoff')"
-                [ngClass]="{'nav-active': activeLink === 'hr-timeoff'}"
-                class="sub-link block py-2 text-sm text-[#3e5470] hover:text-indigo-700 transition rounded-xl px-3 hover:bg-white/60 whitespace-nowrap"
-              >— Time off</a>
-            </div>
-          </div>
+          }
+          
 
           <!-- Content Creators SECTOR -->
           <div class="sector-group">
@@ -113,7 +49,7 @@
               class="sector-toggle flex items-center gap-4 px-4 py-3 rounded-2xl text-[#1f2a3f] font-medium cursor-pointer hover:bg-white/70 transition-all duration-200 group"
             >
               <span class="w-5 text-[#4b6589] group-hover:text-indigo-700 flex-shrink-0"><i class="fa-brands fa-blogger"></i></span>
-              <span *ngIf="!collapsed" class="nav-text text-sm whitespace-nowrap">Content Creators</span>
+              <span *ngIf="!collapsed" class="nav-text text-sm whitespace-nowrap">Content</span>
               
               <i *ngIf="!collapsed" class="sector-chevron fas fa-chevron-right text-xs ml-1 text-[#6a7f9b]" [ngClass]="{'open': openSectors.contentCreators}"></i>
             </div>
@@ -125,20 +61,23 @@
                 class="cursor-pointer sub-link block py-2 text-sm text-[#3e5470] hover:text-indigo-700 transition rounded-xl px-3 hover:bg-white/60 whitespace-nowrap"
               >— Blogs</a>
               <a
-                (click)="setActiveLink('projects')"
-                [ngClass]="{'nav-active': activeLink === 'projects'}"
+                routerLink="products"
+                (click)="setActiveLink('products')"
+                [ngClass]="{'nav-active': activeLink === 'products'}"
                 class="cursor-pointer sub-link block py-2 text-sm text-[#3e5470] hover:text-indigo-700 transition rounded-xl px-3 hover:bg-white/60 whitespace-nowrap"
-              >— Projects</a>
+              >— Products</a>
               <a
+                routerLink="sectors"
                 (click)="setActiveLink('sectors')"
                 [ngClass]="{'nav-active': activeLink === 'sectors'}"
                 class="cursor-pointer sub-link block py-2 text-sm text-[#3e5470] hover:text-indigo-700 transition rounded-xl px-3 hover:bg-white/60 whitespace-nowrap"
               >— Sectors</a>
               <a
-                (click)="setActiveLink('Categories')"
-                [ngClass]="{'nav-active': activeLink === 'Categories'}"
+                routerLink="projects"
+                (click)="setActiveLink('projects')"
+                [ngClass]="{'nav-active': activeLink === 'projects'}"
                 class="cursor-pointer sub-link block py-2 text-sm text-[#3e5470] hover:text-indigo-700 transition rounded-xl px-3 hover:bg-white/60 whitespace-nowrap"
-              >— Categories</a>
+              >— Projects</a>
             </div>
           </div>
         </nav>

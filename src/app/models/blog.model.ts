@@ -9,7 +9,8 @@ export interface Blog {
   id: number;
   title: string;
   content: string;
-  imageUrl?: string;
+  imagePublicId : string;
+  imageUrl : string;
   author?: {
     Id: number;
     name: string;
@@ -20,6 +21,6 @@ export interface Blog {
     name: string;
     email: string;
   };
-  published_date: string; // ISO string
+  published_date: string; 
   comments?: Comment[];
 }

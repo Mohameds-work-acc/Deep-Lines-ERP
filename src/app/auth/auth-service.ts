@@ -6,6 +6,7 @@ import { environment } from '../../environments/environment';
 import { LoginResponse } from '../models/Response/AuthDTOs/login-response.dto';
 
 import { JwtHelperService } from '@auth0/angular-jwt';
+import { Tokens } from '../models/tokens.model';
 
 @Injectable({
   providedIn: 'root',
@@ -23,26 +24,23 @@ export class AuthService {
   constructor(private http: HttpClient) {}
 
   Login(loginDTO: any): Observable<LoginResponse> {
-    console.log(loginDTO);
     return this.http
       .post<LoginResponse>(`${this.apiUrl}/Auth/login`, loginDTO)
       .pipe(
         tap((res) => {
-          console.log(res);
-          this.storeTokens(res);
+          this.storeTokens(res.tokens);
         })
       );
   }
 
 
-  refreshToken(): Observable<LoginResponse> {
+  refreshToken(): Observable<Tokens> {
     const body = {
-      Token: this.getAccessToken(),
-      UserId: parseInt(this.getUserId()!, 10),
+      Token: this.getRefreshToken(),
+      UserId: parseInt(this.getUserId()!, 10)
     };
-
     return this.http
-      .post<LoginResponse>(`${this.apiUrl}/Auth/refresh`, body)
+      .post<Tokens>(`${this.apiUrl}/Auth/refresh`, body)
       .pipe(
         tap((res) => {
           this.storeTokens(res);
@@ -50,20 +48,48 @@ export class AuthService {
       );
   }
 
-  storeTokens(res: LoginResponse): void {
+  changePassword(changeDto: any): Observable<any> {
+    return this.http
+      .post<any>(`${this.apiUrl}/Auth/change-password`, changeDto)
+      .pipe(
+        catchError((err) => {
+          return throwError(() => err);
+        })
+      );
+  }
+  resetPassword(id: number): Observable<any> {
+    return this.http
+      .post<any>(`${this.apiUrl}/Auth/reset-password/${id}`, {})
+      .pipe(
+        catchError((err) => {
+          return throwError(() => err);
+        })
+      );
+  }
+  deleteRefreshToken(token: string): Observable<any> {
+    return this.http
+      .post<any>(`${this.apiUrl}/Auth/delete-refreshToken`, { token })
+      .pipe(
+        catchError((err) => {
+          return throwError(() => err);
+        })
+      );
+  }
+  storeTokens(res: Tokens): void {
     if (!res) {
       return;
     }
 
-    const decodedToken = this.jwtHelper.decodeToken(res.token);
+    const decodedToken = this.jwtHelper.decodeToken(res.jwtToken);
     const expiresIn = decodedToken.exp * 1000 - Date.now();
 
 
 
-    localStorage.setItem(this.ACCESS_TOKEN_KEY, res.token);
-    localStorage.setItem(this.REFRESH_TOKEN_KEY, res.refreshToken.token);
-    localStorage.setItem(this.ACCESS_EXPIRES_KEY,  new Date(Date.now() + expiresIn).toISOString());
-    localStorage.setItem(this.REFRESH_EXPIRES_KEY, res.refreshToken.expiryDate);
+    localStorage.setItem(this.ACCESS_TOKEN_KEY, res.jwtToken);
+    localStorage.setItem(this.REFRESH_TOKEN_KEY, res.refreshToken);
+    localStorage.setItem(this.ACCESS_EXPIRES_KEY,  res.jwtTokenExpires);
+    localStorage.setItem(this.REFRESH_EXPIRES_KEY, res.refreshTokenExpires);
+
 
 
   }
@@ -75,9 +101,9 @@ export class AuthService {
 
   }
 
-  getUserRole(): string | null {
+  getUserDepartment(): string | null {
     const decodedToken = this.getDecodedToken();
-    // The full claim URI for role
+    
     return decodedToken ? decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] : null;
   }
   getUserEmail(): string | null {
@@ -123,15 +149,11 @@ export class AuthService {
     if (!token) {
       return false;
     }
-    const expire = localStorage.getItem(this.ACCESS_EXPIRES_KEY);
-    if (!expire) {
-      return true;
-    }
-    const expireTime = new Date(expire).getTime();
-    return Date.now() < expireTime;
+    return  true;
   }
 
   logout(): void {
+    this.deleteRefreshToken(this.getRefreshToken()!)
     this.clearTokens();
   }
 }

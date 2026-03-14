@@ -18,11 +18,17 @@ export class BlogService {
     return this.http.get<Blog>(`${this.base}/${id}`);
   }
 
-  create(blog: any): Observable<Blog> {
+  create(blog: FormData | any): Observable<any> {
+    if (blog instanceof FormData) {
+      return this.http.post<any>(this.base, blog);
+    }
     return this.http.post<Blog>(this.base, blog);
   }
 
-  update(id: number, blog: any): Observable<Blog> {
+  update(id: number, blog: FormData | any): Observable<any> {
+    if (blog instanceof FormData) {
+      return this.http.put<any>(`${this.base}/${id}`, blog);
+    }
     return this.http.put<Blog>(`${this.base}/${id}`, blog);
   }
 

@@ -1,10 +1,6 @@
+import { Tokens } from "../../tokens.model";
 
 export interface LoginResponse {
-  token: string;
-  refreshToken: {
-    id: number;
-    token: string;
-    expiryDate: string;
-  };
+  tokens : Tokens
   message: string;
 }

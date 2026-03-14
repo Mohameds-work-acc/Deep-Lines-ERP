@@ -1,4 +1,4 @@
-<div class="h-dvh overflow-y-scroll">
+<div class="h-dvh w-dvw sm:w-auto overflow-y-scroll">
   <div class="employees-container p-6 space-y-6 h-max mb-28">
 
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -126,11 +126,11 @@
         </select>
       </div>
     </div>
-      <div class="w-280 overflow-scroll">
+      <div class="w-auto sm:w-280 overflow-scroll">
         <!-- Employees Table -->
         <div *ngIf="!loading" class="glass-card rounded-3xl w-max">
           <div class="w-max">
-            <table style="width: 1rem;" class="employees-table ">
+            <table  class="employees-table ">
               <thead class="bg-white/40 backdrop-blur-sm">
                 <tr>
                   <th class="px-6 py-4 text-left text-xs font-semibold text-[#5c6f88] uppercase tracking-wider">ID</th>
@@ -139,7 +139,6 @@
                   <th class="px-6 py-4 text-left text-xs font-semibold text-[#5c6f88] uppercase tracking-wider">Phone</th>
                   <th class="px-6 py-4 text-left text-xs font-semibold text-[#5c6f88] uppercase tracking-wider">Department</th>
                   <th class="px-6 py-4 text-left text-xs font-semibold text-[#5c6f88] uppercase tracking-wider">Job Title</th>
-                  <th class="px-6 py-4 text-left text-xs font-semibold text-[#5c6f88] uppercase tracking-wider">Role</th>
                   <th class="px-6 py-4 text-left text-xs font-semibold text-[#5c6f88] uppercase tracking-wider">Joined</th>
                   <th class="px-6 py-4 text-left text-xs font-semibold text-[#5c6f88] uppercase tracking-wider">Status</th>
                   <th class="px-6 py-4 text-left text-xs font-semibold text-[#5c6f88] uppercase tracking-wider">Actions</th>
@@ -177,11 +176,6 @@
                     <span class="text-sm text-[#1f2a3f]">{{ e.jopTitle }}</span>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="px-3 py-1 text-xs rounded-full bg-indigo-100/80 text-indigo-700">
-                      {{ e.role }}
-                    </span>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
                     <div class="flex items-center gap-2">
                       <i class="far fa-calendar text-[10px] text-indigo-400"></i>
                       <span class="text-sm text-[#5c6f88]">{{ e.joinedDate | date:'MMM d, y' }}</span>
@@ -214,6 +208,13 @@
                         title="Delete employee"
                       >
                         <i class="fas fa-trash-alt"></i>
+                      </button>
+                      <button
+                        (click)="resetEmployeePassword(e.id)"
+                        class="w-9 h-9 rounded-xl bg-green-100/80 text-green-600 hover:bg-green-200 transition-all duration-200 flex items-center justify-center transform hover:scale-110 hover:-rotate-3"
+                        title="Reset employee password"
+                      >
+                        <i class="fa-solid fa-arrows-rotate"></i>
                       </button>
                     </div>
                   </td>
